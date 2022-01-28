@@ -1,6 +1,5 @@
-package com.ceiba.prueba
+package com.ceiba.prueba.ui
 
-import android.util.Log
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import com.ceiba.prueba.databinding.ItemUserBinding
@@ -16,7 +15,7 @@ class UserViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         binding.tvEmail.text = user.email
 
         binding.btnViewPublications.setOnClickListener {
-            Log.e("Button clic", "Is click")
+
         }
     }
 

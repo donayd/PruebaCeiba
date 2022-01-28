@@ -1,6 +1,8 @@
 package com.ceiba.prueba
 
+import android.app.ProgressDialog
 import android.os.Bundle
+import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -11,6 +13,7 @@ import com.ceiba.prueba.db.AppDatabase
 import com.ceiba.prueba.db.User
 import com.ceiba.prueba.db.UserDao
 import com.ceiba.prueba.service.APIService
+import com.ceiba.prueba.ui.UserAdapter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -20,28 +23,51 @@ import retrofit2.converter.gson.GsonConverterFactory
 class MainActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
 
     private lateinit var userDao: UserDao
+    private lateinit var progressDialog: ProgressDialog
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var adapter: UserAdapter
+
     private val fullList: MutableList<User> = mutableListOf()
     private val userList: MutableList<User> = mutableListOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val db = AppDatabase.invoke(this)
-        userDao = db.userDao()
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        binding.svUser.setOnQueryTextListener(this)
+
+        initBD()
         initRecycleView()
     }
 
+    private fun initBD() {
+        val db = AppDatabase.invoke(this)
+        userDao = db.userDao()
+        CoroutineScope(Dispatchers.IO).launch {
+            //userDao.nukeTable()
+            fullList.addAll(userDao.getAll())
+            runOnUiThread {
+                if (fullList.isEmpty()) {
+                    progressDialog = ProgressDialog(this@MainActivity)
+                    progressDialog.setTitle("Descargando información")
+                    progressDialog.setMessage("Los usuarios estan siendo descargados por favor espere")
+                    progressDialog.show()
+                    searchUsers()
+                } else {
+                    userList.addAll(fullList)
+                    adapter.notifyDataSetChanged()
+                    hideKeyboard()
+                }
+            }
+        }
+    }
+
     private fun initRecycleView() {
+        binding.svUser.setOnQueryTextListener(this)
         binding.svUser.queryHint = "Buscar usuario"
         adapter = UserAdapter(userList)
         binding.rvUsers.layoutManager = LinearLayoutManager(this)
         binding.rvUsers.adapter = adapter
-        searchUsers()
     }
 
     private fun getRetrofit(): Retrofit {
@@ -59,12 +85,12 @@ class MainActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
                 if (users != null) {
                     userDao.insertAll(users)
                 }
-                userList.clear()
                 fullList.clear()
                 fullList.addAll(userDao.getAll())
-                userList.addAll(userDao.getAll())
                 runOnUiThread {
+                    userList.addAll(fullList)
                     adapter.notifyDataSetChanged()
+                    progressDialog.dismiss()
                     hideKeyboard()
                 }
             } else {
@@ -78,8 +104,8 @@ class MainActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
 
     private fun searchByUser(query: String) {
         userList.clear()
-        userList.addAll(fullList)
-        userList.retainAll { it.name?.toLowerCase()!!.contains(query) }
+        userList.addAll(fullList.filter { it.name?.toLowerCase()!!.contains(query) })
+        binding.tvList.visibility = if (userList.isEmpty()) View.VISIBLE else View.GONE
         adapter.notifyDataSetChanged()
     }
 
@@ -93,11 +119,12 @@ class MainActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
     }
 
     override fun onQueryTextSubmit(query: String?): Boolean {
+        hideKeyboard()
         return true
     }
 
     override fun onQueryTextChange(query: String?): Boolean {
-        if (!query.isNullOrEmpty()) {
+        if (query != null) {
             searchByUser(query)
         }
         return true

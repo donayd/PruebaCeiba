@@ -1,8 +1,9 @@
-package com.ceiba.prueba
+package com.ceiba.prueba.ui
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.ceiba.prueba.R
 import com.ceiba.prueba.db.User
 
 class UserAdapter(val users: List<User>) : RecyclerView.Adapter<UserViewHolder>() {

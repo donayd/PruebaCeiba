@@ -10,8 +10,8 @@ interface UserDao {
     @Query("SELECT * FROM user WHERE id IN (:userIds)")
     fun loadAllByIds(userIds: IntArray): List<User>
 
-    @Query("SELECT * FROM user WHERE name LIKE :user_name")
-    fun findByName(user_name: String): User
+    @Query("SELECT * FROM user WHERE name LIKE :userName")
+    fun findByName(userName: String): User
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertUser(user: User)
@@ -21,4 +21,7 @@ interface UserDao {
 
     @Delete
     fun delete(user: User)
+
+    @Query("DELETE FROM user")
+    fun nukeTable()
 }
