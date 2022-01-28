@@ -1,4 +1,4 @@
-package com.ceiba.prueba.ui
+package com.ceiba.prueba.ui.rvUser
 
 import android.view.LayoutInflater
 import android.view.ViewGroup

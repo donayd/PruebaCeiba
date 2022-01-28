@@ -1,5 +1,6 @@
 package com.ceiba.prueba.service
 
+import com.ceiba.prueba.db.Post
 import com.ceiba.prueba.db.User
 import retrofit2.Response
 import retrofit2.http.GET
@@ -12,6 +13,9 @@ interface APIService {
     suspend fun getUsers(): Response<ArrayList<User>>
 
     @GET("posts")
-    suspend fun getPost(@Url url: String): Response<ArrayList<User>>
+    suspend fun getPost(): Response<ArrayList<Post>>
+
+    @GET
+    suspend fun getUserPost(@Url url: String): Response<ArrayList<Post>>
 
 }

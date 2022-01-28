@@ -1,4 +1,4 @@
-package com.ceiba.prueba
+package com.ceiba.prueba.activities
 
 import android.app.ProgressDialog
 import android.os.Bundle
@@ -13,7 +13,7 @@ import com.ceiba.prueba.db.AppDatabase
 import com.ceiba.prueba.db.User
 import com.ceiba.prueba.db.UserDao
 import com.ceiba.prueba.service.APIService
-import com.ceiba.prueba.ui.UserAdapter
+import com.ceiba.prueba.ui.rvUser.UserAdapter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
